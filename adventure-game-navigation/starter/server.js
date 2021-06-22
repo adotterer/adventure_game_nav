@@ -47,7 +47,6 @@ const server = http.createServer((req, res) => {
     }
 
     if (req.method === "GET" && /^\/rooms\/[1-5]$/.test(req.url)) {
-      const currentRoom = world.rooms[req.url[req.url.length -1]]
       fs.readFile("./views/room.html", "utf8", function (err, data) {
         if (err) {
           return console.log(err);
@@ -65,20 +64,18 @@ const server = http.createServer((req, res) => {
     }
 
     if (req.method === "GET" && /^\/rooms\/[1-5]\/west|east|north|south$/.test(req.url)) {
-      console.log("hello from direction")
       const [_empty,_rooms, number, direction] = req.url.split("/")
-      console.log(direction.slice(0,1), "direction")
+
       let nextRoom = player.move(direction.slice(0,1))
       res.statusCode = 302;
-      console.log("NEXT ROOM", nextRoom.id)
-      console.log(player.currentRoom)
+
       res.setHeader("Location", `/rooms/${Number(nextRoom.id)}`);
       res.end();
       return;
     }
 
     if (req.method === "POST" && /^\/items\/[\d]\/drop|eat|take$/.test(req.url)) {
-      console.log("POST, ITEMS URL SPLIT", req.url.split("/"))
+
       const [_empty, _items, itemId, action] = req.url.split("/");
       const reloadPage = function () {
         res.statusCode = 302;
