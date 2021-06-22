@@ -64,7 +64,7 @@ const server = http.createServer((req, res) => {
     }
 
     if (req.method === "GET" && /^\/rooms\/[1-5]\/west|east|north|south$/.test(req.url)) {
-      const [_empty,_rooms, number, direction] = req.url.split("/")
+      const [__empty,__rooms, __number, direction] = req.url.split("/")
 
       let nextRoom = player.move(direction.slice(0,1))
       res.statusCode = 302;
@@ -76,7 +76,7 @@ const server = http.createServer((req, res) => {
 
     if (req.method === "POST" && /^\/items\/[\d]\/drop|eat|take$/.test(req.url)) {
 
-      const [_empty, _items, itemId, action] = req.url.split("/");
+      const [__empty, __items, itemId, action] = req.url.split("/");
       const reloadPage = function () {
         res.statusCode = 302;
         res.setHeader("Location", `/rooms/${Number(player.currentRoom.id)}`);
