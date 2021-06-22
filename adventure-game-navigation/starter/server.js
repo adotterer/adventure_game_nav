@@ -60,6 +60,7 @@ const server = http.createServer((req, res) => {
             return console.log(err);
           }
           let result = data
+            // these can be replaced with just strings
             .replace(/#{roomName}/g, player.currentRoom.name)
             .replace(/#{inventory}/g, player.inventoryToString())
             .replace(/#{roomItems}/g,  player.currentRoom.itemsToString())
