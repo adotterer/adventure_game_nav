@@ -36,13 +36,9 @@ const server = http.createServer((req, res) => {
   }
 
     if (req.method === "POST" && req.url === "/player") {
-      // IMPORTANT: Destructure for the roomId if there is a room selection input field,
-      // Otherwise just get the name from
-      // (not on current starter however)
       const [[__nameLabel, name], [__roomLabel, roomId]] = reqBody.split("&").map(formData => formData.split("="))
-      // JUST PUT A RANDOM NUMBER ----| UNTIL THE STARTER PROJECT IS UPDATED WITH THE NEW INPUT FIELD
-      //                              V
-      const currentRoom = world.rooms[1]
+
+      const currentRoom = world.rooms[roomId]
       player = new Player(name, currentRoom)
       res.statusCode = 302;
       res.setHeader("Location", `/rooms/${Number(roomId)}`);
@@ -50,37 +46,35 @@ const server = http.createServer((req, res) => {
       return;
     }
 
-    // if (req.method === "GET" && /^\/rooms\/[1-5]$/.test(req.url)) {
-    if (req.method === "GET" && req.url.startsWith("/rooms/")) {
-      const [__empty, __rooms, number, direction] = req.url.split("/");
+    if (req.method === "GET" && /^\/rooms\/[1-5]$/.test(req.url)) {
+      fs.readFile("./views/room.html", "utf8", function (err, data) {
+        if (err) {
+          return console.log(err);
+        }
+        let result = data
+          .replace(/#{roomName}/g, player.currentRoom.name)
+          .replace(/#{inventory}/g, player.inventoryToString())
+          .replace(/#{roomItems}/g,  player.currentRoom.itemsToString())
+          .replace(/#{exits}/g,  player.currentRoom.exitsToString())
 
-      if (number && !direction) {
-        fs.readFile("./views/room.html", "utf8", function (err, data) {
-          if (err) {
-            return console.log(err);
-          }
-          let result = data
-            .replace(/#{roomName}/g, player.currentRoom.name)
-            .replace(/#{inventory}/g, player.inventoryToString())
-            .replace(/#{roomItems}/g,  player.currentRoom.itemsToString())
-            .replace(/#{exits}/g,  player.currentRoom.exitsToString())
-
-          res.setHeader("Content-Type", "text/html");
-          return res.end(result)
-          })
-      } else if (number && direction) {
-        let nextRoom = player.move(direction.slice(0,1))
-        res.statusCode = 302;
-
-        res.setHeader("Location", `/rooms/${Number(nextRoom.id)}`);
-        res.end();
-        return;
-      }
+        res.setHeader("Content-Type", "text/html");
+        return res.end(result)
+        })
 
     }
 
-    // if (req.method === "POST" && /^\/items\/[\d]\/drop|eat|take$/.test(req.url)) {
-    if (req.method === "POST" && req.url.startsWith("/items/")) {
+    if (req.method === "GET" && /^\/rooms\/[1-5]\/west|east|north|south$/.test(req.url)) {
+      const [__empty,__rooms, __number, direction] = req.url.split("/")
+
+      let nextRoom = player.move(direction.slice(0,1))
+      res.statusCode = 302;
+
+      res.setHeader("Location", `/rooms/${Number(nextRoom.id)}`);
+      res.end();
+      return;
+    }
+
+    if (req.method === "POST" && /^\/items\/[\d]\/drop|eat|take$/.test(req.url)) {
 
       const [__empty, __items, itemId, action] = req.url.split("/");
       const reloadPage = function () {
