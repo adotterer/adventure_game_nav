@@ -37,7 +37,7 @@ const server = http.createServer((req, res) => {
 
     if (req.method === "POST" && req.url === "/player") {
       // IMPORTANT: Destructure for the roomId if there is a room selection input field,
-      // Otherwise just get the name from
+      // Otherwise just get the name from the form
       // (not on current starter however)
       const [[__nameLabel, name], [__roomLabel, roomId]] = reqBody.split("&").map(formData => formData.split("="))
       // JUST PUT A RANDOM NUMBER ----| UNTIL THE STARTER PROJECT IS UPDATED WITH THE NEW INPUT FIELD
